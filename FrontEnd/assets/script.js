@@ -43,6 +43,15 @@ async function categoryRecovery() {
       button.textContent = catergory[i].name;
 
       button_container.appendChild(button);
+
+
+//ajout de l'écoute pour les boutons
+button.addEventListener("click", () =>{
+
+console.log(button.textContent)
+
+})
+
     }
   } catch (error) {
     console.error("Erreur : ", error);
