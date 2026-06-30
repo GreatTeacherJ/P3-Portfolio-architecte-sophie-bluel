@@ -1,8 +1,3 @@
-console.log("Démarage du script");
-
-worksRecovery();
-LisenPageLoad();
-
 //Récupération de toutes la gallerie sur l'API et ajout de toutes la gallerie dans la page
 async function worksRecovery() {
   try {
@@ -93,16 +88,55 @@ function desactivated_button(button) {
 
 function teste() {}
 
+//Appel quand la page est chargées afin de vérifier si le mode
+// edition est activé en fonction du token du session storage
 function LisenPageLoad() {
   document.addEventListener("DOMContentLoaded", () => {
+    //Récupération de la banniére édition
     const editionBanner = document.querySelector(".edition-mode");
 
+    //Récupération du texte "login"
+    const login_aref = document.getElementById("login-text");
+
+    //si il y a le token alors on active le mode edition, affichage de la banniére
     if (sessionStorage.getItem("token")) {
       editionBanner.classList.remove("hidden");
-      console.log("token : ",sessionStorage.getItem("token"));
+
+      login_aref.textContent = "Logout"; //le bouton login deviens logout
     } else {
+      //si il n'y a pas de token on masque la banniére édition
       editionBanner.classList.add("hidden");
-      console.log("Desactivation mode edition")
+      login_aref.textContent = "Login"; //le bouton logout deviens login
     }
   });
 }
+
+//Quand on click sur logout le token est supprimer du storage
+// et la page est rechargée
+//i le bouton est login il est redirigé vers la page de log
+function selectLog() {
+  const login_aref = document.getElementById("login-text");
+
+  //si pas logé alors on va à la page de log
+  if (login_aref.textContent === "Login") {
+    window.location.href = "pages/login.html";
+  } else {//sinon on supprimer le token et on change le texte en login
+    if (sessionStorage.getItem("token")) {
+      //Suppression du token
+      sessionStorage.removeItem("token");
+      login_aref.textContent = "Login";
+    }
+
+    //Recharge de la page, apelle de la fonction ListenPageLoad
+    location.reload();
+  }
+}
+
+//Code lancer au démarrage
+console.log("Démarage du script");
+
+worksRecovery();
+LisenPageLoad();
+
+//Ajout de l'écoute sur le texte de log, qui prend deux valeur login ou logout
+document.getElementById("login-text").addEventListener("click", selectLog);

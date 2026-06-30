@@ -1,8 +1,5 @@
-
 togglePassword();
 listenLoginForm();
-
-
 
 //crée la fonction pour l'appuis sur l'oueil
 // pour cacher ou voir le mot de passe
@@ -12,7 +9,7 @@ function togglePassword() {
   const icon = document.querySelector(".fa-solid");
 
   toggleBtn.addEventListener("click", (e) => {
-e.preventDefault();
+    e.preventDefault();
 
     console.log("clique sur oueil");
     if (passwordInput.type === "password") {
@@ -32,14 +29,11 @@ function listenLoginForm() {
   document.querySelector("form").addEventListener("submit", function (e) {
     e.preventDefault(); // empêche le rechargement de la page
 
+    const email = document.getElementById("email").value;
+    const userPassword = document.getElementById("password").value;
 
-const email = document.getElementById("email").value;
-const userPassword =  document.getElementById("password").value;
-
-if(!email){
-
-  
-}
+    if (!email) {
+    }
 
     sendLoginRequest(email, userPassword);
   });
@@ -62,16 +56,36 @@ async function sendLoginRequest(email, userPassword) {
     },
   });
 
-  const data = await reponse.json();
+  const errorMessage = document.getElementById("error-message");
 
-  console.log(reponse.status);
+  switch (reponse.status) {
+    case 200:
+      const data = await reponse.json();
 
-  //Recupération du token
-  const token = data.token;
-  console.log("token de connexion : ", token);
+      console.log(reponse.status);
 
-  //Enregistrement du token dans la session Storage
-  //La session Strorage sera vider en cas de
-  // fermeture du site par le navigateur
-  sessionStorage.setItem("token", data.token);
+      //Recupération du token
+      const token = data.token;
+      console.log("token de connexion : ", token);
+
+      //Enregistrement du token dans la session Storage
+      //La session Strorage sera vider en cas de
+      // fermeture du site par le navigateur
+      sessionStorage.setItem("token", data.token);
+      window.location.href = "../index.html";
+      break;
+    case 401:
+      errorMessage.style.display = "block";
+      errorMessage.textContent =
+        "Autorisation insufisante pour accéder au mode edition.";
+      break;
+    case 402:
+      errorMessage.style.display = "block";
+      errorMessage.textContent = "Email ou mot de passe incorrect";
+      break;
+    default:
+      errorMessage.style.display = "block";
+      errorMessage.textContent = "Connexion serveur impossible.";
+      break;
+  }
 }
