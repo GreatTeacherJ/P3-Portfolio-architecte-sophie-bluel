@@ -53,7 +53,7 @@ function categoryRecovery(setCatergory) {
 
     //Affiche toutes les figure qui on la bonne categorie et masque les autres
     button.addEventListener("click", () => {
-      document.querySelectorAll("figure").forEach((fig) => {
+      document.querySelectorAll("#gallery figure").forEach((fig) => {
         if (fig.dataset.category === category) {
           fig.classList.remove("hidden");
         } else {
