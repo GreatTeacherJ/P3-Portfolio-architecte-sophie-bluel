@@ -230,7 +230,7 @@ background-color: #5da1b6;
 }
 
 .hidden{
-display: none;
+display: none !important;
 
 }
 
@@ -260,3 +260,6 @@ color: white;
 
 }
 
+.cacher{
+	display: none;
+}

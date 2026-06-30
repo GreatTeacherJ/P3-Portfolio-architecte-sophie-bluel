@@ -66,7 +66,7 @@ function categoryRecovery(setCatergory) {
     });
   });
 
-  //Ajout du listener pour le bouton tous
+  //Ajout du listener pour le bouton "Tous"
   document.getElementById("button-all").addEventListener("click", (e) => {
     document.querySelectorAll("figure").forEach((fig) => {
       fig.classList.remove("hidden");
@@ -99,7 +99,7 @@ function LisenPageLoad() {
 
     if (sessionStorage.getItem("token")) {
       editionBanner.classList.remove("hidden");
-      console.log("token",sessionStorage.getItem("token"));
+      console.log("token : ",sessionStorage.getItem("token"));
     } else {
       editionBanner.classList.add("hidden");
       console.log("Desactivation mode edition")
