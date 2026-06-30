@@ -237,5 +237,26 @@ display: none;
 a {
 text-decoration: none;
 color: inherit;
+cursor: pointer;
+}
+
+.edition-mode{
+display: flex;
+	background-color: black;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+}
+
+.edition-mode p{
+color: white;
+padding: 21px 20px;
+	font-size: 1.2em;
+	text-align: center;
+}
+
+.fa-regular {
+color: white;
 
 }
+

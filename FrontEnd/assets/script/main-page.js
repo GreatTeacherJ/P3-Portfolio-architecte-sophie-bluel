@@ -1,6 +1,7 @@
 console.log("Démarage du script");
 
 worksRecovery();
+LisenPageLoad();
 
 //Récupération de toutes la gallerie sur l'API et ajout de toutes la gallerie dans la page
 async function worksRecovery() {
@@ -91,3 +92,17 @@ function desactivated_button(button) {
 }
 
 function teste() {}
+
+function LisenPageLoad() {
+  document.addEventListener("DOMContentLoaded", () => {
+    const editionBanner = document.querySelector(".edition-mode");
+
+    if (sessionStorage.getItem("token")) {
+      editionBanner.classList.remove("hidden");
+      console.log("token",sessionStorage.getItem("token"));
+    } else {
+      editionBanner.classList.add("hidden");
+      console.log("Desactivation mode edition")
+    }
+  });
+}
