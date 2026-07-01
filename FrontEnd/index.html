@@ -12,13 +12,14 @@
     />
     <meta name="description" content="" />
     <link rel="stylesheet" href="./assets/style.css" />
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
 
     <script src="assets/script/main-page.js" defer></script>
-	
   </head>
   <body>
-
     <!--Banniére pour le mode édition cacher de base-->
     <div class="edition-mode hidden">
       <i class="fa-regular fa-pen-to-square"></i>
@@ -26,13 +27,15 @@
       <p>Mode édition</p>
     </div>
     <header>
-      
-      <a href="index.html"><h1>Sophie Bluel <span>Architecte d'intérieur</span></h1></a>
+      <a href="index.html"
+        ><h1>Sophie Bluel <span>Architecte d'intérieur</span></h1></a
+      >
       <nav>
         <ul>
           <li>projets</li>
           <li>contact</li>
-         <li id="login-text">login</li>
+
+          <li id="login-text">login</li>
 
           <li><img src="./assets/icons/instagram.png" alt="Instagram" /></li>
         </ul>
@@ -63,16 +66,20 @@
         </article>
       </section>
       <section id="portfolio">
+        <div class="text-projet-container">
         <h2>Mes Projets</h2>
+        <div class="container-button-modif">
+          <i class="fa-regular fa-pen-to-square"></i>
+          <p>modifier</p>
+        </div>
+        </div>
         <div class="button_container">
           <button id="button-all" class="button_active">Tous</button>
+          <!--Ici les boutons des catégorie seront chargés-->
         </div>
         <div id="gallery" class="gallery">
           <!-- Ici la gellerie charger depuis l'API -->
         </div>
-
-
-
       </section>
       <section id="contact">
         <h2>Contact</h2>
