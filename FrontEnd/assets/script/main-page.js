@@ -1,5 +1,7 @@
+//Récupération des éléments du DOM
 const modalGallery = document.querySelector(".modal-gallery");
 const modalAdd = document.querySelector(".modal-add");
+const galleryHtml = document.getElementById("gallery");
 
 //Récupération de toutes la gallerie sur l'API et ajout de toutes la gallerie dans la page
 async function worksRecovery() {
@@ -7,8 +9,11 @@ async function worksRecovery() {
     const reponse = await fetch("http://localhost:5678/api/works");
     const gallerieApi = await reponse.json();
 
-    const galleryHtml = document.getElementById("gallery");
-    const set = new Set();
+    //Vide la gallerie avant de la remplir avec les nouvelles données
+    galleryHtml.innerHTML = "";
+
+    //Pour chaque élément de la gallerie on créer une figure 
+    // avec l'image et le titre
     for (let i = 0; i < gallerieApi.length; i++) {
       const workImg = document.createElement("img");
       const workTitle = document.createElement("figcaption");
@@ -18,16 +23,13 @@ async function worksRecovery() {
 
       const work = document.createElement("figure"); //figure qui contient chaque travail
       work.dataset.category = gallerieApi[i].category.name; //ajout d'un dataset pour la category pour le filtre
+      work.dataset.id = gallerieApi[i].id;//Récupération de l'id du travail dans l'API
 
       work.appendChild(workImg);
       work.appendChild(workTitle);
 
       galleryHtml.appendChild(work);
-
-      set.add(gallerieApi[i].category.name); //ajout de la catergorie au set eviter les doublons
     }
-
-    categoryRecovery(set); //envoie du set pour la création des bouton de filtre
   } catch (error) {
     console.log("Chargement de la gallerie echouée");
     console.error("Erreur : ", error);
@@ -35,11 +37,16 @@ async function worksRecovery() {
 }
 
 //Recuperation des catégorie et création d'un bouton de filtre par cattégorie
-function categoryRecovery(setCatergory) {
+function categoryRecovery() {
   const button_container = document.querySelector(".button_container");
+  const set = new Set();
 
+  galleryHtml.childNodes.forEach((element) => {
+    set.add(element.dataset.category); //ajout de la catergorie au set eviter les doublons
+  });
+console.log(set);
   //Création d'un bouton et d'un listener pour chaque categorie
-  setCatergory.forEach((category) => {
+  set.forEach((category) => {
     const button = document.createElement("button");
     button.textContent = category;
 
@@ -113,8 +120,11 @@ function selectLog() {
 //Change le mode de la page entre edition et visiteur
 //si true le mode sera en edition
 //si false le mode sera en visiteur
+//Ce lance à chaque fois que la page est rechargée
 async function ModeVerification() {
-  await worksRecovery();
+  
+  await worksRecovery(); 
+  categoryRecovery();
 
   //Récupération de la banniére édition
   const editionBanner = document.querySelector(".edition-mode");
@@ -176,9 +186,13 @@ function openModale() {
   `,
     );
 
-    figClone.querySelector(".trash-can-icon").addEventListener("click", () => {
+    //Ajout d'un listener sur l'icone poubelle pour supprimer
+    //  la figure du modal et de l'API
+    figClone.querySelector(".trash-can-icon").addEventListener("click", (e) => {
+      e.preventDefault();
       figClone.remove(); // supprime la figure du modal
-      // ici tu pourrais aussi appeler ton API DELETE
+      const id = figClone.dataset.id;
+      deleteWork(id);
     });
 
     container_works.appendChild(figClone);
@@ -211,17 +225,15 @@ async function addWorkToGallery(e) {
   const titleInput = document.getElementById("title").value;
   const categoryInput = document.getElementById("category").value;
 
-
   formData.append("image", inputPhoto);
   formData.append("title", titleInput);
   formData.append("category", categoryInput);
 
   console.log(categoryInput);
 
-  
-  if(!inputPhoto){
+  if (!inputPhoto) {
     console.error("Aucun fichier sélectionné !");
-  return;
+    return;
   }
 
   const reponse = await fetch("http://localhost:5678/api/works", {
@@ -233,18 +245,19 @@ async function addWorkToGallery(e) {
     body: formData,
   });
 
-if(!reponse.ok){
-const texteErreur  =await reponse.text();
-console.error("Détail de l'erreur :", texteErreur);
-
-}
+  if (!reponse.ok) {
+    const texteErreur = await reponse.text();
+    console.error("Détail de l'erreur :", texteErreur);
+  }
 
   console.log(
     `| Envois de l'image          |
      | Satut : ${reponse.status}  |
-     | reponse : ${reponse.text}       |  
+     | reponse : ${reponse.text}  |  
   `,
   );
+
+  worksRecovery();
 }
 
 //Ecouteur d'événement pour vérifier si le formulaire est rempli
@@ -272,6 +285,33 @@ function LisenPageLoad() {
   categorie.addEventListener("change", verifierFormulaire);
 }
 
+//Fonction pour supprimer un travail de la gallerie
+async function deleteWork(id) {
+
+ const reponse= await fetch(`http://localhost:5678/api/works/${id}`, {
+  method : "DELETE",
+  headers : {
+    Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+  }
+
+
+ });
+
+ if (!reponse.ok) {
+    const texteErreur = await reponse.text();
+    console.error("Détail de l'erreur :", texteErreur);
+  }
+
+  console.log(
+    `| Envois de l'image          |
+     | Satut : ${reponse.status}  |
+     | reponse : ${reponse.text}  |  
+  `,
+  );
+
+worksRecovery();
+}
+
 //************************Code lancer au démmarrage***********************
 
 //Ajout de l'écoute quand la page est chargées afin de vérifier si le mode
@@ -285,9 +325,7 @@ document.getElementById("login-text").addEventListener("click", selectLog);
 document.querySelector("#fermer").addEventListener("click", closeModale);
 
 //Ajout de l'écoute du bouton modifier en mode edition pour ouvrir la modale
-document
-  .querySelector(".container-button-modif")
-  .addEventListener("click", openModale);
+document.querySelector(".container-button-modif").addEventListener("click", openModale);
 
 //Pour le teste de fonction
 document.getElementById("test").addEventListener("click", test);
