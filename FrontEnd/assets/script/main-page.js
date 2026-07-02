@@ -2,6 +2,7 @@
 const modalGallery = document.querySelector(".modal-gallery");
 const modalAdd = document.querySelector(".modal-add");
 const galleryHtml = document.getElementById("gallery");
+const formSelect = document.getElementById("category");
 
 //Récupération de toutes la gallerie sur l'API et ajout de toutes la gallerie dans la page
 async function worksRecovery() {
@@ -208,6 +209,9 @@ function viewModalAdd() {
   modalGallery.classList.add("hidden");
   modalAdd.classList.remove("hidden");
   document.getElementById("retour").classList.remove("hidden");
+  
+  //Récupération des catégories pour le select du formulaire
+  addCategoriesForm(); 
 }
 //Affichage de la modale gallerie et masquage de la modale d'ajout
 function viewModalGallery() {
@@ -311,6 +315,34 @@ async function deleteWork(id) {
 
 worksRecovery();
 }
+
+//Fonction pour ajouter les catégories dans le select du formulaire d'ajout
+async function addCategoriesForm() {
+  try {
+    const reponse = await fetch("http://localhost:5678/api/categories");
+    
+    if (!reponse.ok) {
+      throw new Error("Erreur lors de la récupération des catégories");
+    }
+    
+    formSelect.innerHTML = ""; // Vide le select avant de le remplir avec les nouvelles données
+    const categories = await reponse.json();
+    
+
+    categories.forEach(categorie => {
+      const option = document.createElement("option");
+      option.value = categorie.id;
+      option.textContent = categorie.name;
+      formSelect.appendChild(option);
+    });
+
+  } catch (erreur) {
+    console.error(erreur);
+  }
+}
+
+
+
 
 //************************Code lancer au démmarrage***********************
 
