@@ -1,3 +1,8 @@
+ const modalGallery = document.querySelector(".modal-gallery");
+const modalAdd = document.querySelector(".modal-add");
+
+
+
 //Récupération de toutes la gallerie sur l'API et ajout de toutes la gallerie dans la page
 async function worksRecovery() {
   try {
@@ -183,8 +188,10 @@ button_container.innerHTML = "";
 function openModale() {
 
 
-  document.querySelector(".overlay").classList.remove("hidden");
-  document.querySelector(".modale").classList.remove("hidden");
+
+  document.querySelector("dialog").showModal();
+  viewModalGallery(); //affiche la modale gallerie par défaut
+  
 
 //Recupération de toutes les figure de la gallerie et 
 // de la div qui contiendra les figure de la modale
@@ -221,9 +228,21 @@ container_works.appendChild(figClone);
 
 }
 
+//Fermeture de la modale
 function closeModale() {
-  document.querySelector(".overlay").classList.add("hidden");
-  document.querySelector(".modale").classList.add("hidden");
+  document.querySelector("dialog").close();
+}
+//Affichage de la modale d'ajout et masquage de la modale gallerie
+function viewModalAdd() {
+  modalGallery.classList.add("hidden");
+  modalAdd.classList.remove("hidden");
+  document.getElementById("retour").classList.remove("hidden");
+}
+//Affichage de la modale gallerie et masquage de la modale d'ajout
+function viewModalGallery() {
+  modalGallery.classList.remove("hidden");
+  modalAdd.classList.add("hidden");
+  document.getElementById("retour").classList.add("hidden");
 }
 
 
@@ -246,3 +265,11 @@ document.querySelector(".container-button-modif").addEventListener("click", open
 
  //Pour le teste de fonction
  document.getElementById("test").addEventListener("click", test);
+
+
+
+//Ajout de l'écoute du bouton ajouter pour ouvrir la modale d'ajout d'image
+document.querySelector(".btn_ajouter").addEventListener("click", viewModalAdd);
+
+//Ajout de l'écoute du bouton retour pour revenir à la modale gallerie
+document.getElementById("retour").addEventListener("click", viewModalGallery);

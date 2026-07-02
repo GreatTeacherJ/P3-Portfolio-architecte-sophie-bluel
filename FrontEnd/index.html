@@ -104,28 +104,61 @@
       </nav>
     </footer>
 
-    <div class="overlay hidden"></div>
+  
 
-    <section class="modale hidden">
-      <button id="fermer"><i class="fa-solid fa-xmark"></i></button>
-      <p>Galerie photo</p>
-      <div class="work_model_container">
-        
-      <!-- Ici les figure de la gallerie seront cloné pour la modale-->
+<dialog id="modale" aria-labelledby="modale-titre">
+  <button id="retour" aria-label="Retour" class="hidden">
+    <i class="fa-solid fa-arrow-left"></i>
+  </button>
+  <button id="fermer" aria-label="Fermer">
+    <i class="fa-solid fa-xmark"></i>
+  </button>
 
+  <!-- Vue galerie -->
+  <div class="modal-view modal-gallery">
+    <p id="modale-titre">Galerie photo</p>
+    <div class="work_model_container">
+      <!-- figures clonées -->
+    </div>
 
+    <hr class="separateur" />
+    <button class="btn_ajouter button_active">Ajouter</button>
+  </div>
 
-      
-        
-</div>
+  <!-- Vue ajout photo -->
+  <div class="modal-view modal-add hidden">
+    <p>Ajout photo</p>
 
-<hr class="separateur">
-<button  id="test" >bouton teste</button>
-  <button class="btn_ajouter button_active" >Ajouter</button>
+    <form id="form-ajout-photo">
+      <div class="upload-zone">
+        <i class="fa-regular fa-image upload-icon"></i>
 
-    </section>
+        <label for="input-photo" class="btn-upload">
+          + Ajouter photo
+          <input type="file" id="input-photo" accept=".jpg,.jpeg,.png" hidden />
+        </label>
 
+        <span class="upload-info">jpg, png : 4mo max</span>
+      </div>
 
-    
+      <label for="titre" class="label-form">Titre</label>
+      <input type="text" id="titre" name="titre" class="input-form" />
+
+      <label for="categorie" class="label-form">Catégorie</label>
+      <select id="categorie" name="categorie" class="input-form">
+        <option value=""></option>
+        <option value="1">Objets</option>
+        <option value="2">Appartements</option>
+        <option value="3">Hôtels & restaurants</option>
+      </select>
+
+      <hr class="separateur" />
+
+      <button type="submit" class="btn_valider" disabled>Valider</button>
+    </form>
+  </div>
+  <button id="test">teste</button>
+</dialog>
+
   </body>
 </html>
