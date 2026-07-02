@@ -134,6 +134,7 @@ li:hover {
 	grid-template-columns: 1fr 1fr 1fr;
 	grid-column-gap: 20px;
 	grid-row-gap: 20px;
+	margin-top: 50px;
 }
 
 .gallery img {
@@ -192,11 +193,11 @@ footer nav ul {
 
 
 /**********CSS ajouter***************/
-.button_container button{
+.button_container button, .btn_ajouter{
 font-family: 'Syne';
 	font-weight: 700;
 	
-	margin : 50px auto ;
+	margin: 0;
 	padding: 0px 30px;
 	text-align: center;
 	border-radius: 60px ;
@@ -229,10 +230,6 @@ min-height: 128px;
 
 }
 
-.teste{
-background-color: #5da1b6;
-
-}
 
 .hidden{
 display: none !important;
@@ -285,11 +282,17 @@ display: flex;
 flex-direction: row;
 gap: 5px;
 align-items: center;
+cursor: pointer;
 }
 
 .container-button-modif p{
 font-size: 16px;
 
+}
+
+.container-button-modif:hover{
+
+	color: #B1663C;
 }
 
 
@@ -300,6 +303,7 @@ flex-direction: row;
 justify-content: center;
 gap: 20px;
 margin-top: 140px;
+margin-bottom: 50px;
 
 }
 
@@ -316,4 +320,122 @@ margin-top: 140px;
 .hidden-visibility{
 
 	visibility: hidden;
+}
+
+
+/***********Modal et Overlay*****************/
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+#fermer{
+
+position: absolute;
+top: 10px;
+right: 10px;
+background: none;
+border: none;
+
+
+}
+
+
+
+.fa-solid.fa-xmark{
+font-size: 14px;
+
+}
+
+.fa-solid.fa-xmark:hover{
+color: #B1663C;
+
+}
+
+
+
+.modale p{
+
+font-size: 26px;
+text-align: center;
+
+
+
+}
+
+.modale {
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  z-index: 20;
+  width: 40%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+  border-radius: 10px;
+}
+
+.work_model_container {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  overflow-y: auto; /* scroll ici seulement */
+  width: 100%;
+  padding: 10px 50px;
+  box-sizing: border-box;
+}
+
+.work_model_container figure {
+  margin: 0;
+  position: relative;
+}
+
+.work_model_container figure img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  display: block;
+  border-radius: 5px;
+}
+
+.separateur {
+  width: 80%;
+  border: 1px solid #ccc;
+  margin: 15px auto;
+}
+
+.trash-can-icon {
+  position: absolute;
+  background: #000000;
+  border-radius: 2px;
+  width: 17px;
+  height: 17px;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fa-solid.fa-trash-can {
+  font-size: 9px;
+  color: white;
+}
+
+.test{
+
+position: fixed;
+left: 100px;
+top: 100px;
+
 }

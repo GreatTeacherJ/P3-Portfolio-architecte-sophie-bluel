@@ -81,7 +81,43 @@ function desactivated_button(button) {
   button.classList.remove("button_inactive");
 }
 
-function teste() {}
+function test() {
+
+console.log("fonction teste lancer");
+
+//Recupération de toutes les figure de la gallerie et 
+// de la div qui contiendra les figure de la modale
+const works = Array.from( document.getElementById("gallery").children);
+const container_works = document.querySelector(".work_model_container");
+
+//Pour chaque figure de la gallerie on clone la figure et on supprime le figcaption
+works.forEach(fig => {
+
+
+const figClone = fig.cloneNode(true);
+const caption = figClone.querySelector("figcaption");
+
+//Si il y a un figcaption on le supprime du clone pour ne garder que l'image
+if(caption) figClone.removeChild(caption);
+
+  figClone.insertAdjacentHTML("afterbegin", `
+    <div class="trash-can-icon">
+      <i class="fa-solid fa-trash-can"></i>
+    </div>
+  `);
+
+  figClone.querySelector(".trash-can-icon").addEventListener("click", () => {
+    figClone.remove(); // supprime la figure du modal
+    // ici tu pourrais aussi appeler ton API DELETE
+  });
+
+container_works.appendChild(figClone);
+
+})
+
+
+
+}
 
 //Quand on click sur logout le token est supprimer du storage
 // et la page est rechargée
@@ -143,9 +179,70 @@ button_container.innerHTML = "";
   }
 }
 
+//Ouverture de la modale
+function openModale() {
+
+
+  document.querySelector(".overlay").classList.remove("hidden");
+  document.querySelector(".modale").classList.remove("hidden");
+
+//Recupération de toutes les figure de la gallerie et 
+// de la div qui contiendra les figure de la modale
+const works = Array.from( document.getElementById("gallery").children);
+const container_works = document.querySelector(".work_model_container");
+
+container_works.innerHTML = ""; //On vide le container pour ne pas avoir de doublon
+
+//Pour chaque figure de la gallerie on clone la figure et on supprime le figcaption
+works.forEach(fig => {
+
+
+const figClone = fig.cloneNode(true);
+const caption = figClone.querySelector("figcaption");
+
+//Si il y a un figcaption on le supprime du clone pour ne garder que l'image
+if(caption) figClone.removeChild(caption);
+
+  figClone.insertAdjacentHTML("afterbegin", `
+    <div class="trash-can-icon">
+      <i class="fa-solid fa-trash-can"></i>
+    </div>
+  `);
+
+  figClone.querySelector(".trash-can-icon").addEventListener("click", () => {
+    figClone.remove(); // supprime la figure du modal
+    // ici tu pourrais aussi appeler ton API DELETE
+  });
+
+container_works.appendChild(figClone);
+
+})
+
+
+}
+
+function closeModale() {
+  document.querySelector(".overlay").classList.add("hidden");
+  document.querySelector(".modale").classList.add("hidden");
+}
+
+
+
+//************************Code lancer au démmarrage***********************
+
+
 //Ajout de l'écoute quand la page est chargées afin de vérifier si le mode
 // edition est activé en fonction du token du session storage
 document.addEventListener("DOMContentLoaded", ModeVerification);
 
 //Ajout de l'écoute sur le texte de log, qui prend deux valeur login ou logout
 document.getElementById("login-text").addEventListener("click", selectLog);
+
+//Bouton fermer de la modale
+document.querySelector("#fermer").addEventListener("click", closeModale);
+
+//Ajout de l'écoute du bouton modifier en mode edition pour ouvrir la modale 
+document.querySelector(".container-button-modif").addEventListener("click", openModale);
+
+ //Pour le teste de fonction
+ document.getElementById("test").addEventListener("click", test);
