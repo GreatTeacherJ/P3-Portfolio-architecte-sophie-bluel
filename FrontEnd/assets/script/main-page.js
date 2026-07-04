@@ -149,7 +149,7 @@ async function ModeVerification() {
 
     login_aref.textContent = "Logout"; //le bouton login deviens logout
 
-    button_container.innerHTML = "";
+    button_container.classList.add("hidden");
 
     //MODE VISITEUR
   } else {
@@ -389,10 +389,17 @@ function ModaleImgPreview(event) {
 
     reader.onload = () => {
       previewImage.src = reader.result; //on met l'url du reader dans l'image
+
+      // Nettoyage des écouteurs d'événements pour éviter les fuites de mémoire
+            reader.onload = null;
+            reader.onerror = null;
     };
 
     reader.onerror = () => {
       alert("Erreur lors du chargement de l'image. Veuillez rééssayer.");
+      // Nettoyage des écouteurs d'événements pour éviter les fuites de mémoire
+            reader.onload = null;
+            reader.onerror = null;
     };
 
     reader.readAsDataURL(file); //on charge l'image dans le reader
