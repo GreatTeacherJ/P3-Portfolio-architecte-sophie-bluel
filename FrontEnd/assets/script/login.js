@@ -32,7 +32,8 @@ function listenLoginForm() {
     const email = document.getElementById("email").value;
     const userPassword = document.getElementById("password").value;
 
-    if (!email) {
+    if (!email || !userPassword) {      
+      return;
     }
 
     sendLoginRequest(email, userPassword);
