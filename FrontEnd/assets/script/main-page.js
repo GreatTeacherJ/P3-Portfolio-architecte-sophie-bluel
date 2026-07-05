@@ -8,34 +8,24 @@ const modalGallery = document.querySelector(".modal-gallery");
 const modalAdd = document.querySelector(".modal-add");
 const galleryHtml = document.getElementById("gallery");
 const formSelect = document.getElementById("category");
+let allWorks = [];
 
 //Récupération de toutes la gallerie sur l'API et ajout de toutes la gallerie dans la page
-async function worksRecovery() {
+async function retrieveWorks() {
   try {
     const reponse = await fetch("http://localhost:5678/api/works");
-    const gallerieApi = await reponse.json();
+    const galleryApi = await reponse.json();
 
     //Vide la gallerie avant de la remplir avec les nouvelles données
     galleryHtml.innerHTML = "";
 
     //Pour chaque élément de la gallerie on créer une figure
     // avec l'image et le titre
-    for (let i = 0; i < gallerieApi.length; i++) {
-      const workImg = document.createElement("img");
-      const workTitle = document.createElement("figcaption");
+    galleryApi.forEach((work) => {
+      galleryHtml.appendChild(creatFigur(work));
+    });
 
-      workImg.src = gallerieApi[i].imageUrl;
-      workTitle.textContent = gallerieApi[i].title;
-
-      const work = document.createElement("figure"); //figure qui contient chaque travail
-      work.dataset.category = gallerieApi[i].category.name; //ajout d'un dataset pour la category pour le filtre
-      work.dataset.id = gallerieApi[i].id; //Récupération de l'id du travail dans l'API
-
-      work.appendChild(workImg);
-      work.appendChild(workTitle);
-
-      galleryHtml.appendChild(work);
-    }
+    allWorks = galleryApi;
   } catch (error) {
     console.log("Chargement de la gallerie echouée");
     console.error("Erreur : ", error);
@@ -97,11 +87,6 @@ function desactivated_button(button) {
   button.classList.remove("button_inactive");
 }
 
-function test() {
-  console.log("fonction teste lancer");
-  viewModalAdd();
-}
-
 //Quand on click sur logout le token est supprimer du storage
 // et la page est rechargée
 //i le bouton est login il est redirigé vers la page de log
@@ -128,7 +113,7 @@ function selectLog() {
 //si false le mode sera en visiteur
 //Ce lance à chaque fois que la page est rechargée
 async function ModeVerification() {
-  await worksRecovery();
+  await retrieveWorks();
   categoryRecovery();
 
   //Récupération de la banniére édition
@@ -164,47 +149,23 @@ async function ModeVerification() {
 
 //Ouverture de la modale
 function viewModalGallery() {
+  //Affichage de la modale
   document.querySelector("dialog").showModal();
 
+  //Affichage de la modale gallerie et masquage de la modalle ajouter
   modalGallery.classList.remove("hidden");
   modalAdd.classList.add("hidden");
   document.getElementById("retour").classList.add("hidden");
   document.getElementById("modale-titre").textContent = "Galerie photo";
 
-  //Recupération de toutes les figure de la gallerie et
-  // de la div qui contiendra les figure de la modale
-  const works = Array.from(document.getElementById("gallery").children);
+  //Récupération du container pour les appérçu
   const container_works = document.querySelector(".work_model_container");
 
   container_works.innerHTML = ""; //On vide le container pour ne pas avoir de doublon
 
-  //Pour chaque figure de la gallerie on clone la figure et on supprime le figcaption
-  works.forEach((fig) => {
-    const figClone = fig.cloneNode(true);
-    const caption = figClone.querySelector("figcaption");
-
-    //Si il y a un figcaption on le supprime du clone pour ne garder que l'image
-    if (caption) figClone.removeChild(caption);
-
-    figClone.insertAdjacentHTML(
-      "afterbegin",
-      `
-    <div class="trash-can-icon">
-      <i class="fa-solid fa-trash-can"></i>
-    </div>
-  `,
-    );
-
-    //Ajout d'un listener sur l'icone poubelle pour supprimer
-    //  la figure du modal et de l'API
-    figClone.querySelector(".trash-can-icon").addEventListener("click", (e) => {
-      e.preventDefault();
-      figClone.remove(); // supprime la figure du modal
-      const id = figClone.dataset.id;
-      deleteWork(id);
-    });
-
-    container_works.appendChild(figClone);
+  //Pour chaque figure de la gallerie on créer une miniature
+  allWorks.forEach((work) => {
+    container_works.appendChild(creatFigur(work, { forModal: true }));
   });
 }
 
@@ -280,7 +241,7 @@ async function addWorkToGallery(e) {
   `,
   );
 
-  await worksRecovery();
+  await retrieveWorks();
   viewModalGallery(); //Retour à la modale gallerie
 }
 
@@ -330,7 +291,7 @@ async function deleteWork(id) {
   `,
   );
 
-  worksRecovery();
+  retrieveWorks();
 }
 
 //Fonction pour ajouter les catégories dans le select du formulaire d'ajout
@@ -363,8 +324,6 @@ function ModaleImgPreview(event) {
 
   //si le fichier existe
   if (file) {
-    
-
     //on verifi si le type de fichier reçu est dans notre liste
     if (ALLOWED_FILE_TYPE.indexOf(file.type) === -1) {
       alert("Type de fichier incorect, type accépté .jpeg .png");
@@ -391,19 +350,69 @@ function ModaleImgPreview(event) {
       previewImage.src = reader.result; //on met l'url du reader dans l'image
 
       // Nettoyage des écouteurs d'événements pour éviter les fuites de mémoire
-            reader.onload = null;
-            reader.onerror = null;
+      reader.onload = null;
+      reader.onerror = null;
     };
 
     reader.onerror = () => {
       alert("Erreur lors du chargement de l'image. Veuillez rééssayer.");
       // Nettoyage des écouteurs d'événements pour éviter les fuites de mémoire
-            reader.onload = null;
-            reader.onerror = null;
+      reader.onload = null;
+      reader.onerror = null;
     };
 
     reader.readAsDataURL(file); //on charge l'image dans le reader
   }
+}
+
+//Renvoi une figure semon le travail, suivant les option on peut rajouter
+// la pubelle pour la modale ou renvoyer avec le figcaption pour la gallery
+// voi d'autre option pour la suite
+function creatFigur(work, { forModal = false } = {}) {
+  //Création des éléments global
+  const workImg = document.createElement("img");
+
+  workImg.src = work.imageUrl;
+
+  //figure qui contient le travail
+  const figure = document.createElement("figure");
+
+  figure.dataset.category = work.category.name; //ajout d'un dataset pour la category pour le filtre
+  figure.dataset.id = work.id; //Récupération de l'id du travail
+
+  //Ajout de l'limage à la figure
+  figure.appendChild(workImg);
+
+  //pour la modale
+  if (forModal) {
+    //ajout du bouton poubelle
+    figure.insertAdjacentHTML(
+      "afterbegin",
+      `
+    <div class="trash-can-icon">
+      <i class="fa-solid fa-trash-can"></i>
+    </div>
+  `,
+    );
+
+    //Ajout d'un listener sur l'icone poubelle pour supprimer
+    //  la figure du modal et de l'API
+    figure.querySelector(".trash-can-icon").addEventListener("click", (e) => {
+      e.preventDefault();
+      figure.remove(); // supprime la figure du modal
+      const id = figure.dataset.id;
+      deleteWork(id);
+    });
+  }
+  //pour la gallerie
+  else {
+    //Réupération du titre
+    const workTitle = document.createElement("figcaption");
+    workTitle.textContent = work.title;
+    figure.appendChild(workTitle);
+  }
+
+  return figure;
 }
 
 //************************Code lancer au démmarrage***********************

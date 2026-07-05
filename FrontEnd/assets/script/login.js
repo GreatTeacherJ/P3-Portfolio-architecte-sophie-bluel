@@ -1,5 +1,4 @@
-togglePassword();
-listenLoginForm();
+
 
 //crée la fonction pour l'appuis sur l'oueil
 // pour cacher ou voir le mot de passe
@@ -44,7 +43,7 @@ function listenLoginForm() {
 //  le mettre dans le session storage
 async function sendLoginRequest(email, userPassword) {
   //envoie de la requete pour vaalidation et reucperation du token
-  const reponse = await fetch("http://localhost:5678/api/users/login", {
+  const response = await fetch("http://localhost:5678/api/users/login", {
     method: "POST",
     body: JSON.stringify({
       email: email,
@@ -59,15 +58,15 @@ async function sendLoginRequest(email, userPassword) {
 
   const errorMessage = document.getElementById("error-message");
 
-  switch (reponse.status) {
+  switch (response.status) {
     case 200:
-      const data = await reponse.json();
+      const data = await response.json();
 
-      console.log(reponse.status);
+      console.log(response.status);
 
       //Recupération du token
       const token = data.token;
-      console.log("token de connexion : ", token);
+      
 
       //Enregistrement du token dans la session Storage
       //La session Strorage sera vider en cas de
@@ -90,3 +89,6 @@ async function sendLoginRequest(email, userPassword) {
       break;
   }
 }
+
+togglePassword();
+listenLoginForm();
