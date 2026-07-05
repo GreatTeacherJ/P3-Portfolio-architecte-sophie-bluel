@@ -26,16 +26,19 @@ flex: 1;
 
 
 
-.password-wrapper button {
+.toggle-password {
   position: absolute;
-  right: 8px;
+  right: 0px;
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
   cursor: pointer;
   font-size: 30px;
+  height: 100%;
+  aspect-ratio: 1 / 1;
 }
+
 
 input{
 display: flex;
@@ -54,3 +57,17 @@ align-content: center;
   font-size: 0.85rem;
   display: none;
 }
+
+.fa-solid.fa-eye, .fa-solid.fa-eye-slash{
+font-size: 20px;
+color: #1D6154;
+transition: filter 0.2s ease;
+
+
+}
+
+.fa-solid.fa-eye:hover, 
+.fa-solid.fa-eye-slash:hover{
+filter: brightness(70%);
+}
+
