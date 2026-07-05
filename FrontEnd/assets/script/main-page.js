@@ -13,8 +13,8 @@ let allWorks = [];
 //Récupération de toutes la gallerie sur l'API et ajout de toutes la gallerie dans la page
 async function retrieveWorks() {
   try {
-    const reponse = await fetch("http://localhost:5678/api/works");
-    const galleryApi = await reponse.json();
+    const response = await fetch("http://localhost:5678/api/works");
+    const galleryApi = await response.json();
 
     //Vide la gallerie avant de la remplir avec les nouvelles données
     galleryHtml.innerHTML = "";
@@ -22,7 +22,7 @@ async function retrieveWorks() {
     //Pour chaque élément de la gallerie on créer une figure
     // avec l'image et le titre
     galleryApi.forEach((work) => {
-      galleryHtml.appendChild(creatFigur(work));
+      galleryHtml.appendChild(createFigure(work));
     });
 
     allWorks = galleryApi;
@@ -33,7 +33,7 @@ async function retrieveWorks() {
 }
 
 //Recuperation des catégorie et création d'un bouton de filtre par cattégorie
-function categoryRecovery() {
+function retrieveCategory() {
   const button_container = document.querySelector(".button_container");
   const set = new Set();
 
@@ -41,14 +41,14 @@ function categoryRecovery() {
     set.add(element.dataset.category); //ajout de la catergorie au set eviter les doublons
   });
   console.log(set);
-  //Création d'un bouton et d'un listener pour chaque categorie
+  //Création d'un bouton et d'un listener pour chaque category
   set.forEach((category) => {
     const button = document.createElement("button");
     button.textContent = category;
 
     button_container.appendChild(button);
 
-    //Affiche toutes les figure qui on la bonne categorie et masque les autres
+    //Affiche toutes les figure qui on la bonne category et masque les autres
     button.addEventListener("click", () => {
       document.querySelectorAll("#gallery figure").forEach((fig) => {
         if (fig.dataset.category === category) {
@@ -58,7 +58,7 @@ function categoryRecovery() {
         }
       });
 
-      desactivated_button(button);
+      desactivateButton(button);
     });
   });
 
@@ -68,12 +68,12 @@ function categoryRecovery() {
       fig.classList.remove("hidden");
     });
 
-    desactivated_button(e.target);
+    desactivateButton(e.target);
   });
 }
 
 //désactive le bouton activé
-function desactivated_button(button) {
+function desactivateButton(button) {
   const activeButton = document.querySelector(".button_active");
 
   //Le bouton actif devient inactif
@@ -90,11 +90,11 @@ function desactivated_button(button) {
 //Quand on click sur logout le token est supprimer du storage
 // et la page est rechargée
 //i le bouton est login il est redirigé vers la page de log
-function selectLog() {
-  const login_aref = document.getElementById("login-text");
+function handleLoginLogout() {
+  const loginLink = document.getElementById("login-text");
 
   //si pas logé alors on va à la page de log
-  if (login_aref.textContent === "Login") {
+  if (loginLink.textContent === "Login") {
     window.location.href = "pages/login.html";
   } else {
     //sinon on supprimer le token et on change le texte en login
@@ -112,15 +112,15 @@ function selectLog() {
 //si true le mode sera en edition
 //si false le mode sera en visiteur
 //Ce lance à chaque fois que la page est rechargée
-async function ModeVerification() {
+async function checkMode() {
   await retrieveWorks();
-  categoryRecovery();
+  retrieveCategory();
 
   //Récupération de la banniére édition
   const editionBanner = document.querySelector(".edition-mode");
 
   //Récupération du texte "login"
-  const login_aref = document.getElementById("login-text");
+  const loginLink = document.getElementById("login-text");
 
   const button_container = document.querySelector(".button_container");
   const container_button_modif = document.querySelector(
@@ -132,7 +132,7 @@ async function ModeVerification() {
   if (sessionStorage.getItem("token")) {
     editionBanner.classList.remove("hidden"); //afficher la banniére edition
 
-    login_aref.textContent = "Logout"; //le bouton login deviens logout
+    loginLink.textContent = "Logout"; //le bouton login deviens logout
 
     button_container.classList.add("hidden");
 
@@ -140,7 +140,7 @@ async function ModeVerification() {
   } else {
     editionBanner.classList.add("hidden"); //afficher la banniére edition
 
-    login_aref.textContent = "Login"; //le bouton login deviens logout
+    loginLink.textContent = "Login"; //le bouton login deviens logout
 
     button_container.classList.remove("hidden");
     container_button_modif.classList.add("hidden");
@@ -165,12 +165,12 @@ function viewModalGallery() {
 
   //Pour chaque figure de la gallerie on créer une miniature
   allWorks.forEach((work) => {
-    container_works.appendChild(creatFigur(work, { forModal: true }));
+    container_works.appendChild(createFigure(work, { forModal: true }));
   });
 }
 
 //Fermeture de la modale
-function closeModale() {
+function closeModal() {
   document.querySelector("dialog").close();
 }
 //Affichage de la modale d'ajout et masquage de la modale gallerie
@@ -189,13 +189,7 @@ function viewModalAdd() {
   document.querySelector(".upload-info").classList.remove("hidden");
   document.getElementById("preview-image").classList.add("hidden");
 }
-//Affichage de la modale gallerie et masquage de la modale d'ajout
-function viewModalGalleryOld() {
-  modalGallery.classList.remove("hidden");
-  modalAdd.classList.add("hidden");
-  document.getElementById("retour").classList.add("hidden");
-  document.getElementById("modale-titre").textContent = "Galerie photo";
-}
+
 
 //Fonction pour ajouter un travail à la gallerie
 async function addWorkToGallery(e) {
@@ -220,7 +214,7 @@ async function addWorkToGallery(e) {
     return;
   }
 
-  const reponse = await fetch("http://localhost:5678/api/works", {
+  const response = await fetch("http://localhost:5678/api/works", {
     method: "POST",
     headers: {
       accept: "application/json",
@@ -229,15 +223,15 @@ async function addWorkToGallery(e) {
     body: formData,
   });
 
-  if (!reponse.ok) {
-    const texteErreur = await reponse.text();
+  if (!response.ok) {
+    const texteErreur = await response.text();
     console.error("Détail de l'erreur :", texteErreur);
   }
 
   console.log(
     `| Envois de l'image          |
-     | Satut : ${reponse.status}  |
-     | reponse : ${reponse.text}  |  
+     | Satut : ${response.status}  |
+     | response : ${response.text}  |  
   `,
   );
 
@@ -249,45 +243,45 @@ async function addWorkToGallery(e) {
 function LisenPageLoad() {
   const inputPhoto = document.getElementById("input-photo");
   const titre = document.getElementById("title");
-  const categorie = document.getElementById("category");
-  const boutonValider = document.querySelector(".btn_valider");
+  const category = document.getElementById("category");
+  const submitButton = document.querySelector(".btn_valider");
 
-  function verifierFormulaire() {
+  function verifForm() {
     if (
       inputPhoto.files.length > 0 &&
       titre.value.trim() !== "" &&
-      categorie.value !== ""
+      category.value !== ""
     ) {
-      boutonValider.disabled = false;
+      submitButton.disabled = false;
     } else {
-      boutonValider.disabled = true;
+      submitButton.disabled = true;
     }
   }
 
   // Ajout des écouteurs d'événements pour vérifier le formulaire à chaque changement
-  inputPhoto.addEventListener("change", verifierFormulaire);
-  titre.addEventListener("input", verifierFormulaire);
-  categorie.addEventListener("change", verifierFormulaire);
+  inputPhoto.addEventListener("change", verifForm);
+  titre.addEventListener("input", verifForm);
+  category.addEventListener("change", verifForm);
 }
 
 //Fonction pour supprimer un travail de la gallerie
 async function deleteWork(id) {
-  const reponse = await fetch(`http://localhost:5678/api/works/${id}`, {
+  const response = await fetch(`http://localhost:5678/api/works/${id}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${sessionStorage.getItem("token")}`,
     },
   });
 
-  if (!reponse.ok) {
-    const texteErreur = await reponse.text();
+  if (!response.ok) {
+    const texteErreur = await response.text();
     console.error("Détail de l'erreur :", texteErreur);
   }
 
   console.log(
     `| Envois de l'image          |
-     | Satut : ${reponse.status}  |
-     | reponse : ${reponse.text}  |  
+     | Satut : ${response.status}  |
+     | response : ${response.text}  |  
   `,
   );
 
@@ -297,19 +291,19 @@ async function deleteWork(id) {
 //Fonction pour ajouter les catégories dans le select du formulaire d'ajout
 async function addCategoriesForm() {
   try {
-    const reponse = await fetch("http://localhost:5678/api/categories");
+    const response = await fetch("http://localhost:5678/api/categories");
 
-    if (!reponse.ok) {
+    if (!response.ok) {
       throw new Error("Erreur lors de la récupération des catégories");
     }
 
     formSelect.innerHTML = ""; // Vide le select avant de le remplir avec les nouvelles données
-    const categories = await reponse.json();
+    const categories = await response.json();
 
-    categories.forEach((categorie) => {
+    categories.forEach((category) => {
       const option = document.createElement("option");
-      option.value = categorie.id;
-      option.textContent = categorie.name;
+      option.value = category.id;
+      option.textContent = category.name;
       formSelect.appendChild(option);
     });
   } catch (erreur) {
@@ -318,7 +312,7 @@ async function addCategoriesForm() {
 }
 
 //Fonction pour prévisualiser l'image sélectionnée dans le formulaire d'ajout
-function ModaleImgPreview(event) {
+function previewModalImg(event) {
   //Récupération du fichier sélectionné
   const file = event.target.files[0];
 
@@ -368,7 +362,7 @@ function ModaleImgPreview(event) {
 //Renvoi une figure semon le travail, suivant les option on peut rajouter
 // la pubelle pour la modale ou renvoyer avec le figcaption pour la gallery
 // voi d'autre option pour la suite
-function creatFigur(work, { forModal = false } = {}) {
+function createFigure(work, { forModal = false } = {}) {
   //Création des éléments global
   const workImg = document.createElement("img");
 
@@ -419,13 +413,13 @@ function creatFigur(work, { forModal = false } = {}) {
 
 //Ajout de l'écoute quand la page est chargées afin de vérifier si le mode
 // edition est activé en fonction du token du session storage
-document.addEventListener("DOMContentLoaded", ModeVerification);
+document.addEventListener("DOMContentLoaded", checkMode);
 
 //Ajout de l'écoute sur le texte de log, qui prend deux valeur login ou logout
-document.getElementById("login-text").addEventListener("click", selectLog);
+document.getElementById("login-text").addEventListener("click", handleLoginLogout);
 
 //Bouton fermer de la modale
-document.querySelector("#fermer").addEventListener("click", closeModale);
+document.querySelector("#fermer").addEventListener("click", closeModal);
 
 //Ajout de l'écoute du bouton modifier en mode edition pour ouvrir la modale
 document
@@ -446,6 +440,6 @@ document
 //Ajout de l'écoute pour charger l'apérçu de l'image de nouveau projet
 document
   .getElementById("input-photo")
-  .addEventListener("change", ModaleImgPreview);
+  .addEventListener("change", previewModalImg);
 
 LisenPageLoad();
