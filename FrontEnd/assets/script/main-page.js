@@ -14,6 +14,19 @@ let allWorks = [];
 async function retrieveWorks() {
   try {
     const response = await fetch("http://localhost:5678/api/works");
+
+    switch (response.status) {
+      case 500:
+        throw new Error("Erreur serveur, veuillez réessayer plus tard");
+
+      default:
+        if (!response.ok) {
+          const texteErreur = await response.text();
+          throw new Error(`Erreur ${response.status} : ${texteErreur}`);
+        }
+    }
+
+
     const galleryApi = await response.json();
 
     //Vide la gallerie avant de la remplir avec les nouvelles données
@@ -27,7 +40,6 @@ async function retrieveWorks() {
 
     allWorks = galleryApi;
   } catch (error) {
-    console.log("Chargement de la gallerie echouée");
     console.error("Erreur : ", error);
   }
 }
@@ -40,7 +52,7 @@ function retrieveCategory() {
   galleryHtml.childNodes.forEach((element) => {
     set.add(element.dataset.category); //ajout de la catergorie au set eviter les doublons
   });
-  console.log(set);
+
   //Création d'un bouton et d'un listener pour chaque category
   set.forEach((category) => {
     const button = document.createElement("button");
@@ -182,15 +194,11 @@ function viewModalAdd() {
   document.getElementById("retour").classList.remove("hidden");
   document.getElementById("modale-titre").textContent = "Ajout photo";
 
-  
-
   //Récupération des catégories pour le select du formulaire
   addCategoriesForm();
 
-  
   reinitForm();
 }
-
 
 //Fonction pour ajouter un travail à la gallerie
 async function addWorkToGallery(e) {
@@ -208,35 +216,39 @@ async function addWorkToGallery(e) {
   formData.append("title", titleInput);
   formData.append("category", categoryInput);
 
-  //Vérification si un fichier a été sélectionné
-  if (!inputPhoto) {
-    alert("Aucun fichier sélectionné !");
-    console.error("Aucun fichier sélectionné !");
-    return;
+  try {
+    const response = await fetch("http://localhost:5678/api/works", {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+      },
+      body: formData,
+    });
+
+    switch (response.status) {
+      case 400:
+        throw new Error("Erreur requête !");
+      case 401:
+        throw new Error("Erreur d'authentification");
+      case 500:
+        throw new Error("Erreur serveur, veuillez réessayer plus tard");
+
+      default:
+        if (!response.ok) {
+          const texteErreur = await response.text();
+          throw new Error(`Erreur ${response.status} : ${texteErreur}`);
+        }
+    }
+
+
+
+    await retrieveWorks();
+  } catch (error) {
+    console.error("Erreur : ", error);
   }
 
-  const response = await fetch("http://localhost:5678/api/works", {
-    method: "POST",
-    headers: {
-      accept: "application/json",
-      Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-    },
-    body: formData,
-  });
-
-  if (!response.ok) {
-    const texteErreur = await response.text();
-    console.error("Détail de l'erreur :", texteErreur);
-  }
-
-  console.log(
-    `| Envois de l'image          |
-     | Satut : ${response.status}  |
-     | response : ${response.text}  |  
-  `,
-  );
-
-  await retrieveWorks();
+  //Même si erreur on retourne à la modal Gallery
   viewModalGallery(); //Retour à la modale gallerie
 }
 
@@ -267,26 +279,38 @@ function LisenPageLoad() {
 
 //Fonction pour supprimer un travail de la gallerie
 async function deleteWork(id) {
-  const response = await fetch(`http://localhost:5678/api/works/${id}`, {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-    },
-  });
+  try {
+    const response = await fetch(`http://localhost:5678/api/works/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+      },
+    });
 
-  if (!response.ok) {
-    const texteErreur = await response.text();
-    console.error("Détail de l'erreur :", texteErreur);
+    switch (response.status) {
+      case 401:
+        throw new Error("Non autorisé : votre session a peut-être expiré");
+
+      case 500:
+        throw new Error("Erreur serveur, veuillez réessayer plus tard");
+
+      default:
+        if (!response.ok) {
+          const texteErreur = await response.text();
+          throw new Error(`Erreur ${response.status} : ${texteErreur}`);
+        }
+    }
+
+    await retrieveWorks();
+  } catch (error) {
+    console.error("Erreur lors de la suppression :", error.message);
+
+    // Vous pouvez réagir différemment selon le message ou le type
+    if (error.message.includes("Non autorisé")) {
+      // rediriger vers la page de connexion par exemple
+      window.location.href = "/login";
+    }
   }
-
-  console.log(
-    `| Envois de l'image          |
-     | Satut : ${response.status}  |
-     | response : ${response.text}  |  
-  `,
-  );
-
-  retrieveWorks();
 }
 
 //Fonction pour ajouter les catégories dans le select du formulaire d'ajout
@@ -294,17 +318,24 @@ async function addCategoriesForm() {
   try {
     const response = await fetch("http://localhost:5678/api/categories");
 
-    if (!response.ok) {
-      throw new Error("Erreur lors de la récupération des catégories");
-    }
+    switch (response.status) {
+      case 500:
+        throw new Error("Erreur serveur, veuillez réessayer plus tard");
 
+      default:
+        if (!response.ok) {
+          const texteErreur = await response.text();
+          throw new Error(`Erreur ${response.status} : ${texteErreur}`);
+        }
+    }
+   
     formSelect.innerHTML = ""; // Vide le select avant de le remplir avec les nouvelles données
     const categories = await response.json();
 
-      const option = document.createElement("option");
-      option.value = "";
-      option.textContent = "";
-      formSelect.appendChild(option);
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "";
+    formSelect.appendChild(option);
 
     categories.forEach((category) => {
       const option = document.createElement("option");
@@ -365,8 +396,8 @@ function previewModalImg(event) {
   }
 }
 
-function reinitForm(){
-//Remise à zéro du formulaire d'ajout
+function reinitForm() {
+  //Remise à zéro du formulaire d'ajout
   document.querySelector(".fa-image").classList.remove("hidden");
   document.querySelector(".btn-upload").classList.remove("hidden");
   document.querySelector(".upload-info").classList.remove("hidden");
@@ -377,9 +408,6 @@ function reinitForm(){
 
   const category = document.getElementById("category");
   category.value = "3";
-  console.log(category);
-
-
 }
 
 //Renvoi une figure semon le travail, suivant les option on peut rajouter
@@ -439,7 +467,9 @@ function createFigure(work, { forModal = false } = {}) {
 document.addEventListener("DOMContentLoaded", checkMode);
 
 //Ajout de l'écoute sur le texte de log, qui prend deux valeur login ou logout
-document.getElementById("login-text").addEventListener("click", handleLoginLogout);
+document
+  .getElementById("login-text")
+  .addEventListener("click", handleLoginLogout);
 
 //Bouton fermer de la modale
 document.querySelector("#fermer").addEventListener("click", closeModal);
