@@ -64,7 +64,7 @@ function retrieveCategory() {
 
   //Ajout du listener pour le bouton "Tous"
   document.getElementById("button-all").addEventListener("click", (e) => {
-    document.querySelectorAll("figure").forEach((fig) => {
+    document.querySelectorAll("#gallery figure").forEach((fig) => {
       fig.classList.remove("hidden");
     });
 
@@ -167,6 +167,8 @@ function viewModalGallery() {
   allWorks.forEach((work) => {
     container_works.appendChild(createFigure(work, { forModal: true }));
   });
+
+  reinitForm();
 }
 
 //Fermeture de la modale
@@ -180,14 +182,13 @@ function viewModalAdd() {
   document.getElementById("retour").classList.remove("hidden");
   document.getElementById("modale-titre").textContent = "Ajout photo";
 
+  
+
   //Récupération des catégories pour le select du formulaire
   addCategoriesForm();
 
-  //Remise à zéro du formulaire d'ajout
-  document.querySelector(".fa-image").classList.remove("hidden");
-  document.querySelector(".btn-upload").classList.remove("hidden");
-  document.querySelector(".upload-info").classList.remove("hidden");
-  document.getElementById("preview-image").classList.add("hidden");
+  
+  reinitForm();
 }
 
 
@@ -209,7 +210,7 @@ async function addWorkToGallery(e) {
 
   //Vérification si un fichier a été sélectionné
   if (!inputPhoto) {
-    allert("Aucun fichier sélectionné !");
+    alert("Aucun fichier sélectionné !");
     console.error("Aucun fichier sélectionné !");
     return;
   }
@@ -300,6 +301,11 @@ async function addCategoriesForm() {
     formSelect.innerHTML = ""; // Vide le select avant de le remplir avec les nouvelles données
     const categories = await response.json();
 
+      const option = document.createElement("option");
+      option.value = "";
+      option.textContent = "";
+      formSelect.appendChild(option);
+
     categories.forEach((category) => {
       const option = document.createElement("option");
       option.value = category.id;
@@ -357,6 +363,23 @@ function previewModalImg(event) {
 
     reader.readAsDataURL(file); //on charge l'image dans le reader
   }
+}
+
+function reinitForm(){
+//Remise à zéro du formulaire d'ajout
+  document.querySelector(".fa-image").classList.remove("hidden");
+  document.querySelector(".btn-upload").classList.remove("hidden");
+  document.querySelector(".upload-info").classList.remove("hidden");
+  document.getElementById("preview-image").classList.add("hidden");
+
+  const title = document.getElementById("title");
+  title.value = "";
+
+  const category = document.getElementById("category");
+  category.value = "3";
+  console.log(category);
+
+
 }
 
 //Renvoi une figure semon le travail, suivant les option on peut rajouter
